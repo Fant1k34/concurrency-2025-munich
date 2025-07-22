@@ -3,7 +3,20 @@ package day1
 import java.util.concurrent.atomic.*
 import kotlin.coroutines.*
 
-// Never stores `null`-s for simplicity.
+/**
+ * Rendezvous channel is the key synchronization primitive behind coroutines,
+ * it is also known as a synchronous queue.
+ *
+ * At its core, a rendezvous channel is a blocking bounded queue of zero capacity.
+ * It supports `send(e)` and `receive()` requests:
+ * send(e) checks whether the queue contains any receivers and either removes the first one
+ * (i.e. performs a “rendezvous” with it) or adds itself to the queue as a waiting sender and suspends.
+ * The `receive()` operation works symmetrically.
+ *
+ * This implementation never stores `null`-s for simplicity.
+ *
+ * (You may also follow `SequentialChannelInt` in tests for the sequential semantics).
+ */
 class RendezvousChannel<E : Any> {
     private val head: AtomicReference<Node>
     private val tail: AtomicReference<Node>
@@ -16,13 +29,14 @@ class RendezvousChannel<E : Any> {
 
     suspend fun send(element: E) {
         while (true) {
+            // TODO: feel free to change this code if needed.
             // Is this queue empty or contain other senders?
             if (isEmptyOrContainsSenders()) {
                 val success = suspendCoroutine<Boolean> { continuation ->
                     val node = Node(element, continuation as Continuation<Any?>)
                     if (!tryAddNode(tail.get(), node)) {
                         // Fail and retry.
-                        continuation.resume(true)
+                        continuation.resume(false)
                     }
                 }
                 // Finish on success and retry on failure.
@@ -38,6 +52,7 @@ class RendezvousChannel<E : Any> {
 
     suspend fun receive(): E {
         while (true) {
+            // TODO: feel free to change this code if needed.
             // Is this queue empty or contain other receivers?
             if (isEmptyOrContainsReceivers()) {
                 val element = suspendCoroutine<E?> { continuation ->
