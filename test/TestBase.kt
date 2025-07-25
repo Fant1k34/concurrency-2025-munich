@@ -27,7 +27,7 @@ abstract class TestBase(
     @Test
     open fun stressTest() = StressOptions()
         .iterations(scenarios)
-        .invocationsPerIteration(1_000)
+        .invocationsPerIteration(2_000)
         .actorsBefore(actorsBefore)
         .threads(threads)
         .actorsPerThread(2)

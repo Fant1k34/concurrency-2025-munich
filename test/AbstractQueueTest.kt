@@ -8,9 +8,10 @@ abstract class AbstractQueueTest(
     private val queue: Queue<Int>,
     checkObstructionFreedom: Boolean = true,
     threads: Int = 3,
-    actorsBefore: Int = 1
+    actorsBefore: Int = 1,
+    scenarios: Int = 100
 ) : TestBase(
-    scenarios = 100,
+    scenarios = scenarios,
     sequentialSpecification = IntQueueSequential::class,
     checkObstructionFreedom = checkObstructionFreedom,
     threads = threads,
